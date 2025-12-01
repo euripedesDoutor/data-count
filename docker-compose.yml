@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: datacount-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: t3cn0log1@
+      POSTGRES_DB: datacount
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - datacount-network
+
+  backend:
+    build: ./backend
+    container_name: datacount-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:t3cn0log1@@postgres:5432/datacount
+      PORT: 3000
+      JWT_SECRET: s3cr3tk3yd@t@c0unt
+    depends_on:
+      - postgres
+    networks:
+      - datacount-network
+
+  frontend:
+    build:
+      context: ./web
+      args:
+        VITE_API_URL: /api
+    container_name: datacount-frontend
+    networks:
+      - datacount-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: datacount-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - datacount-network
+
+volumes:
+  postgres_data:
+    name: datacount-postgres-data
+
+networks:
+  datacount-network:
+    driver: bridge

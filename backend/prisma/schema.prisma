@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SUPERVISOR
+  INTERVIEWER
+  CLIENT
+}
+
+enum QuestionType {
+  TEXT
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(INTERVIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  mustChangePassword Boolean @default(false)
+
+  surveys   Survey[]   @relation("CreatedSurveys")
+  clientSurveys Survey[] @relation("ClientSurveys")
+  responses Response[]
+
+  managerId Int?
+  manager   User?    @relation("ClientCollectors", fields: [managerId], references: [id])
+  collectors User[]  @relation("ClientCollectors")
+  assignedSurveys Survey[] @relation("SurveyCollectors")
+}
+
+enum SurveyStatus {
+  AT
+  IN
+}
+
+model Survey {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String?
+  status      SurveyStatus @default(IN)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  createdById Int
+  createdBy   User       @relation("CreatedSurveys", fields: [createdById], references: [id])
+  clientId    Int?
+  client      User?      @relation("ClientSurveys", fields: [clientId], references: [id])
+  questions   Question[]
+  responses   Response[]
+  collectors  User[]     @relation("SurveyCollectors")
+  goal        Int        @default(0)
+  goalPerCollector Int   @default(0)
+}
+
+model Question {
+  id       Int          @id @default(autoincrement())
+  text     String
+  type     QuestionType
+  options  Json? // Array of strings for choices
+  order    Int
+  surveyId Int
+  survey   Survey       @relation(fields: [surveyId], references: [id])
+}
+
+model Response {
+  id            Int      @id @default(autoincrement())
+  surveyId      Int
+  survey        Survey   @relation(fields: [surveyId], references: [id])
+  interviewerId Int
+  interviewer   User     @relation(fields: [interviewerId], references: [id])
+  location      Json // { lat: number, lng: number }
+  data          Json // { questionId: answer }
+  createdAt     DateTime @default(now())
+}

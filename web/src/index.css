@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brazil-green: #009c3b;
+  --color-brazil-yellow: #ffdf00;
+  --color-brazil-blue: #002776;
+  --color-brazil-white: #ffffff;
+}
+
+body {
+  background-color: #f3f4f6;
+  font-family: 'Inter', sans-serif;
+}
