@@ -44,6 +44,36 @@ const Reports: React.FC = () => {
     const [filter, setFilter] = useState<{ questionId: number; answer: string } | null>(null);
     const [viewMode, setViewMode] = useState<'charts' | 'text'>('charts');
     const [isPrinting, setIsPrinting] = useState(false);
+
+    // Fetch Clients (Admin only)
+    useEffect(() => {
+        if (userRole === 'ADMIN' && token) {
+            fetch(getApiUrl('/api/clients'), {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then(res => res.json())
+                .then(data => setClients(data))
+                .catch(err => console.error('Error fetching clients:', err));
+        }
+    }, [userRole, token]);
+
+    // Fetch Surveys
+    useEffect(() => {
+        if (!token) return;
+
+        let url = getApiUrl('/api/surveys');
+        if (userRole === 'ADMIN' && selectedClient) {
+            url += `?clientId=${selectedClient}`;
+        }
+
+        fetch(url, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then(res => res.json())
+            .then(data => setSurveys(data))
+            .catch(err => console.error('Error fetching surveys:', err));
+    }, [userRole, token, selectedClient]);
+
     // Fetch Report Data
     useEffect(() => {
         if (!selectedSurvey || !token) return;

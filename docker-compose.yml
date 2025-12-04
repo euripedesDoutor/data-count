@@ -31,7 +31,7 @@ services:
     build:
       context: ./web
       args:
-        VITE_API_URL: /api
+        VITE_API_URL: ""
     container_name: datacount-frontend
     networks:
       - datacount-network

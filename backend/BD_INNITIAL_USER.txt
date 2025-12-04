@@ -1,0 +1,11 @@
+INSERT INTO "User" ("email", "password", "name", "role", "updatedAt")
+VALUES (
+    'admin@datacount.com',
+    '$2b$10$VC71JbochVQXHXCyaQEc4O96KibwnDS.Re84Sdwo3yNEcgluo.8qy', -- Hash para 'admin123'
+    'Admin',
+    'ADMIN',
+    NOW()
+)
+ON CONFLICT ("email") DO UPDATE SET
+    "password" = EXCLUDED."password",
+    "role" = 'ADMIN';

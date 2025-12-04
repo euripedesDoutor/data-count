@@ -17,15 +17,30 @@ interface Survey {
 const CollectorDashboard: React.FC = () => {
     const [surveys, setSurveys] = useState<Survey[]>([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
     const { token } = useAuth();
-    setSurveys(activeSurveys);
-}
-        } catch (error) {
-    console.error('Error fetching surveys:', error);
-} finally {
-    setLoading(false);
-}
-    };
+
+    useEffect(() => {
+        const fetchSurveys = async () => {
+            try {
+                const response = await fetch(getApiUrl('/api/surveys'), {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) throw new Error('Failed to fetch');
+                const data = await response.json();
+                const activeSurveys = data.filter((s: Survey) => s.status === 'AT');
+                setSurveys(activeSurveys);
+            } catch (error) {
+                console.error('Error fetching surveys:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSurveys();
+    }, [token]);
 
 if (loading) {
     return <div className="flex justify-center items-center h-64">Carregando...</div>;

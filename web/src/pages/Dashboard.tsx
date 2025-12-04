@@ -1,24 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Users, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getApiUrl } from '../lib/api';
-
-const dataVotes = [
-    { name: 'Candidato A', votos: 4000 },
-    { name: 'Candidato B', votos: 3000 },
-    { name: 'Candidato C', votos: 2000 },
-    { name: 'Indecisos', votos: 2780 },
-    { name: 'Brancos/Nulos', votos: 1890 },
-];
-
-const dataNPS = [
-    { name: 'Ótimo/Bom', value: 60 },
-    { name: 'Regular', value: 25 },
-    { name: 'Ruim/Péssimo', value: 15 },
-];
-
-const COLORS = ['#009c3b', '#ffdf00', '#002776'];
 
 const Dashboard: React.FC = () => {
     const { token, user } = useAuth();
@@ -47,10 +30,22 @@ const Dashboard: React.FC = () => {
             const response = await fetch(getApiUrl('/api/stats/dashboard-surveys'), {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch dashboard surveys');
+            }
+
             const data = await response.json();
-            setDashboardSurveys(data);
+
+            if (Array.isArray(data)) {
+                setDashboardSurveys(data);
+            } else {
+                console.error('Dashboard surveys data is not an array:', data);
+                setDashboardSurveys([]);
+            }
         } catch (error) {
             console.error('Error fetching dashboard surveys:', error);
+            setDashboardSurveys([]);
         }
     };
 

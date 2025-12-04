@@ -34,11 +34,23 @@ const Clients: React.FC = () => {
             const response = await fetch(getApiUrl('/api/clients'), {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch clients');
+            }
+
             const data = await response.json();
-            setClients(data);
+
+            if (Array.isArray(data)) {
+                setClients(data);
+            } else {
+                console.error('Clients data is not an array:', data);
+                setClients([]);
+            }
             setLoading(false);
         } catch (error) {
             console.error('Error fetching clients:', error);
+            setClients([]);
             setLoading(false);
         }
     };
@@ -84,6 +96,26 @@ const Clients: React.FC = () => {
         }
     };
 
+    const handleDelete = async (id: number) => {
+        if (!window.confirm('Tem certeza que deseja excluir este cliente?')) return;
+
+        try {
+            const response = await fetch(getApiUrl(`/api/clients/${id}`), {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                fetchClients();
+            } else {
+                alert('Erro ao excluir cliente');
+            }
+        } catch (error) {
+            console.error('Error deleting client:', error);
+            alert('Erro ao excluir cliente');
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -115,6 +147,9 @@ const Clients: React.FC = () => {
                 handleCancel();
                 fetchClients();
             }
+        } catch (error) {
+            console.error('Error saving client:', error);
+            alert('Erro ao salvar cliente');
         }
     };
 
@@ -238,13 +273,19 @@ const Clients: React.FC = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button
-                                        onClick={() => handleEdit(client)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEdit(client);
+                                        }}
                                         className="text-indigo-600 hover:text-indigo-900 mr-4"
                                     >
                                         <Edit2 className="w-5 h-5" />
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(client.id)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(client.id);
+                                        }}
                                         className="text-red-600 hover:text-red-900"
                                     >
                                         <Trash2 className="w-5 h-5" />

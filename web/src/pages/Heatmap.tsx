@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getApiUrl } from '../lib/api';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
