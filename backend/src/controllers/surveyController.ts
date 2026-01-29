@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import prisma from '../utils/prisma';
-import fs from 'fs';
+
 
 interface AuthRequest extends Request {
     user?: any;
@@ -9,7 +9,7 @@ interface AuthRequest extends Request {
 export const createSurvey = async (req: AuthRequest, res: Response) => {
     try {
         console.log('createSurvey body:', req.body);
-        fs.appendFileSync('C:/drti/data-count/backend/debug_log_absolute.txt', JSON.stringify(req.body) + '\n');
+
         const { title, description, questions, clientId, collectorIds, goal } = req.body;
         const userId = Number(req.user.id);
         const userRole = req.user.role;
