@@ -19,7 +19,7 @@ services:
     build: ./backend
     container_name: datacount-backend
     environment:
-      DATABASE_URL: postgresql://postgres:t3cn0log1@@postgres:5432/datacount
+      DATABASE_URL: postgresql://postgres:t3cn0log1%40@postgres:5432/datacount
       PORT: 3000
       JWT_SECRET: s3cr3tk3yd@t@c0unt
     depends_on:

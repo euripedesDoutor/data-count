@@ -35,7 +35,11 @@ const Login: React.FC = () => {
             }
 
             if (!response.ok) {
-                throw new Error(data.error || 'Login failed');
+                let errorMessage = data.error || 'Falha no login';
+                if (errorMessage === 'Invalid credentials') {
+                    errorMessage = 'E-mail ou senha incorretos';
+                }
+                throw new Error(errorMessage);
             }
 
             if (data.token) {
