@@ -1,5 +1,10 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const getApiUrl = (path: string) => {
-    return `${API_BASE_URL}${path.startsWith('/') ? path : '/' + path}`;
+    // Ensure a clean base URL without trailing slash
+    const cleanBase = API_BASE_URL.replace(/\/+$/, '');
+    // Ensure path starts with exactly one slash
+    const cleanPath = path.startsWith('/') ? path : '/' + path;
+
+    return `${cleanBase}${cleanPath}`;
 };

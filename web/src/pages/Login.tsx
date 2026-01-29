@@ -23,7 +23,16 @@ const Login: React.FC = () => {
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await response.json();
+            // Check if response is JSON to avoid "Unexpected token <" error
+            const contentType = response.headers.get("content-type");
+            let data;
+
+            if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+            } else {
+                // If not JSON, it's likely an HTML 404/500 from Nginx
+                throw new Error('Falha na comunicação com o servidor. O serviço pode estar temporariamente indisponível ou configurado incorretamente.');
+            }
 
             if (!response.ok) {
                 throw new Error(data.error || 'Login failed');
