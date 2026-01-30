@@ -96,9 +96,15 @@ const SurveyExecution: React.FC = () => {
                 try {
                     const location = await getCurrentLocation();
                     setLocations(prev => ({ ...prev, [currentQuestion.id]: location }));
-                } catch (error) {
+                } catch (error: any) {
                     console.error('GPS Error:', error);
-                    setGpsError('Erro ao obter localização GPS. Verifique se o GPS está ativado.');
+                    if (window.location.protocol !== 'https:') {
+                        setGpsError('O GPS requer uma conexão segura (HTTPS).');
+                    } else if (error.code === 1) { // PERMISSION_DENIED
+                        setGpsError('Permissão de localização negada pelo usuário.');
+                    } else {
+                        setGpsError('Erro ao obter localização GPS. Verifique se o GPS está ativado.');
+                    }
                 }
             }
         }
