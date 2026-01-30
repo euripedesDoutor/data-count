@@ -33,7 +33,7 @@ services:
     build:
       context: ./web
       args:
-        VITE_API_URL: ""
+        VITE_API_URL: "/datacount"
     container_name: datacount-frontend
     ports:
       - "5173:80"
